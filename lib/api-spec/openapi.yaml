@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: diary
+    description: Private encrypted diary entries
+  - name: openai
+    description: OpenAI AI chat operations
 paths:
   /healthz:
     get:
@@ -24,6 +28,292 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /diary/entries:
+    get:
+      operationId: listDiaryEntries
+      tags: [diary]
+      summary: List diary entry metadata (no content)
+      responses:
+        "200":
+          description: List of diary entry stubs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiaryEntryStub"
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createDiaryEntry
+      tags: [diary]
+      summary: Create a new encrypted diary entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiaryEntryInput"
+      responses:
+        "201":
+          description: Created entry stub
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiaryEntryStub"
+        "401":
+          description: Unauthorized
+
+  /diary/entries/{id}:
+    get:
+      operationId: getDiaryEntry
+      tags: [diary]
+      summary: Get a single diary entry (requires diary password in header)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: x-diary-password
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Decrypted diary entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiaryEntry"
+        "401":
+          description: Unauthorized or wrong diary password
+        "404":
+          description: Not found
+    patch:
+      operationId: updateDiaryEntry
+      tags: [diary]
+      summary: Update an encrypted diary entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: x-diary-password
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiaryEntryUpdate"
+      responses:
+        "200":
+          description: Updated entry stub
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiaryEntryStub"
+        "401":
+          description: Unauthorized or wrong diary password
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteDiaryEntry
+      tags: [diary]
+      summary: Delete a diary entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: x-diary-password
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized or wrong diary password
+        "404":
+          description: Not found
+
+  /diary/verify-password:
+    post:
+      operationId: verifyDiaryPassword
+      tags: [diary]
+      summary: Verify the diary password is correct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiaryPasswordCheck"
+      responses:
+        "200":
+          description: Password verification result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiaryPasswordResult"
+        "401":
+          description: Unauthorized
+
+  /diary/setup-password:
+    post:
+      operationId: setupDiaryPassword
+      tags: [diary]
+      summary: Set up or reset the diary password for this user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiaryPasswordSetup"
+      responses:
+        "200":
+          description: Password set successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiaryPasswordResult"
+        "401":
+          description: Unauthorized
+
+  /diary/has-password:
+    get:
+      operationId: getDiaryHasPassword
+      tags: [diary]
+      summary: Check if this user has set a diary password
+      responses:
+        "200":
+          description: Whether diary password exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiaryHasPassword"
+        "401":
+          description: Unauthorized
+
+  /openai/conversations:
+    get:
+      operationId: listOpenaiConversations
+      tags: [openai]
+      summary: List all conversations
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenaiConversation"
+    post:
+      operationId: createOpenaiConversation
+      tags: [openai]
+      summary: Create a new conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpenaiConversationInput"
+      responses:
+        "201":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiConversation"
+
+  /openai/conversations/{id}:
+    get:
+      operationId: getOpenaiConversation
+      tags: [openai]
+      summary: Get conversation with messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiConversationWithMessages"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteOpenaiConversation
+      tags: [openai]
+      summary: Delete a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /openai/conversations/{id}/messages:
+    get:
+      operationId: listOpenaiMessages
+      tags: [openai]
+      summary: List messages in a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenaiMessage"
+    post:
+      operationId: sendOpenaiMessage
+      tags: [openai]
+      summary: Send a text message and receive a streaming text response
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpenaiMessageInput"
+      responses:
+        "200":
+          description: SSE stream of assistant text chunks
+          content:
+            text/event-stream: {}
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +324,188 @@ components:
       required:
         - status
 
+    DiaryEntryStub:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        mood:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - createdAt
+        - updatedAt
+
+    DiaryEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        mood:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - content
+        - createdAt
+        - updatedAt
+
+    DiaryEntryInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        content:
+          type: string
+        mood:
+          type: string
+        diaryPassword:
+          type: string
+      required:
+        - title
+        - content
+        - diaryPassword
+
+    DiaryEntryUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        content:
+          type: string
+        mood:
+          type: string
+
+    DiaryPasswordCheck:
+      type: object
+      properties:
+        password:
+          type: string
+      required:
+        - password
+
+    DiaryPasswordResult:
+      type: object
+      properties:
+        valid:
+          type: boolean
+      required:
+        - valid
+
+    DiaryPasswordSetup:
+      type: object
+      properties:
+        password:
+          type: string
+          minLength: 4
+      required:
+        - password
+
+    DiaryHasPassword:
+      type: object
+      properties:
+        hasPassword:
+          type: boolean
+      required:
+        - hasPassword
+
+    OpenaiConversation:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - createdAt
+
+    OpenaiMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        conversationId:
+          type: integer
+        role:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - conversationId
+        - role
+        - content
+        - createdAt
+
+    OpenaiConversationInput:
+      type: object
+      properties:
+        title:
+          type: string
+      required:
+        - title
+
+    OpenaiMessageInput:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    OpenaiConversationWithMessages:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpenaiMessage"
+      required:
+        - id
+        - title
+        - createdAt
+        - messages
+
+    OpenaiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
