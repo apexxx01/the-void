@@ -5,6 +5,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ClerkProvider, RedirectToSignIn, Show } from "@clerk/react";
 import { AuthSetup } from "@/lib/auth-setup";
 import { SOSButton } from "@/components/SOSButton";
+import { CursorTrail } from "@/components/CursorTrail";
+import { NoiseOverlay } from "@/components/NoiseOverlay";
+import { GlitchBars } from "@/components/GlitchBars";
+import { ScrollProgress } from "@/components/ScrollProgress";
 
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/Landing";
@@ -14,6 +18,8 @@ import Dashboard from "@/pages/Dashboard";
 import Chat from "@/pages/Chat";
 import Diary from "@/pages/Diary";
 import Breathe from "@/pages/Breathe";
+import Reflect from "@/pages/Reflect";
+import Manifest from "@/pages/Manifest";
 
 const queryClient = new QueryClient();
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -43,16 +49,13 @@ const clerkAppearance = {
     headerTitle: "!text-white !font-bold",
     headerSubtitle: "!text-white/50",
     formFieldLabel: "!text-white",
-    formFieldInput:
-      "!bg-transparent !border !border-white/20 !text-white !rounded-none focus:!border-white",
-    formButtonPrimary:
-      "!bg-white !text-black hover:!bg-white/80 !rounded-none !shadow-none",
+    formFieldInput: "!bg-transparent !border !border-white/20 !text-white !rounded-none focus:!border-white",
+    formButtonPrimary: "!bg-white !text-black hover:!bg-white/80 !rounded-none !shadow-none",
     footerActionLink: "!text-white hover:!text-white/80",
     footerActionText: "!text-white/50",
     dividerLine: "!bg-white/20",
     dividerText: "!text-white/50",
-    socialButtonsBlockButton:
-      "!border !border-white/20 !rounded-none hover:!bg-white/10 !text-white",
+    socialButtonsBlockButton: "!border !border-white/20 !rounded-none hover:!bg-white/10 !text-white",
     socialButtonsBlockButtonText: "!text-white",
     alert: "!bg-red-900/20 !border-red-900 !rounded-none",
     alertText: "!text-white",
@@ -92,6 +95,12 @@ function Router() {
       <Route path="/breathe">
         <ProtectedRoute component={Breathe} />
       </Route>
+      <Route path="/reflect">
+        <ProtectedRoute component={Reflect} />
+      </Route>
+      <Route path="/manifest">
+        <ProtectedRoute component={Manifest} />
+      </Route>
 
       <Route component={NotFound} />
     </Switch>
@@ -119,6 +128,11 @@ function App() {
           </ClerkProvider>
         </WouterRouter>
         <Toaster />
+        {/* Global ambient overlays */}
+        <CursorTrail />
+        <NoiseOverlay opacity={0.025} />
+        <GlitchBars />
+        <ScrollProgress />
       </TooltipProvider>
     </QueryClientProvider>
   );
