@@ -291,33 +291,78 @@
 
 /* ─── Chat message appear ────────────────────────────────────── */
 @keyframes message-appear {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(8px); filter: blur(2px); }
+  to   { opacity: 1; transform: translateY(0);   filter: blur(0);   }
 }
 
 .message-appear {
-  animation: message-appear 0.4s ease forwards;
+  animation: message-appear 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-/* ─── White/3 utility ────────────────────────────────────────── */
-.bg-white\/3 {
-  background-color: rgba(255, 255, 255, 0.03);
+/* ─── Float drift (ambient decorative elements) ──────────────── */
+@keyframes float-drift {
+  0%   { transform: translateY(0px)   rotate(0deg); }
+  33%  { transform: translateY(-6px)  rotate(0.5deg); }
+  66%  { transform: translateY(-2px)  rotate(-0.3deg); }
+  100% { transform: translateY(0px)   rotate(0deg); }
 }
 
-.bg-white\/2 {
-  background-color: rgba(255, 255, 255, 0.02);
+.float-drift {
+  animation: float-drift 8s ease-in-out infinite;
 }
 
-.bg-white\/6 {
-  background-color: rgba(255, 255, 255, 0.06);
+/* ─── Slow pulse glow ────────────────────────────────────────── */
+@keyframes glow-pulse {
+  0%, 100% { text-shadow: 0 0 12px rgba(255,255,255,0.06); }
+  50%       { text-shadow: 0 0 24px rgba(255,255,255,0.14), 0 0 48px rgba(255,255,255,0.05); }
 }
 
-.border-white\/8 {
-  border-color: rgba(255, 255, 255, 0.08);
+.glow-pulse {
+  animation: glow-pulse 5s ease-in-out infinite;
+}
+
+/* ─── Staggered fade-in for lists ────────────────────────────── */
+@keyframes stagger-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stagger-in {
+  animation: stagger-in 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* ─── White/N utilities ──────────────────────────────────────── */
+.bg-white\/2  { background-color: rgba(255,255,255,0.02); }
+.bg-white\/3  { background-color: rgba(255,255,255,0.03); }
+.bg-white\/4  { background-color: rgba(255,255,255,0.04); }
+.bg-white\/6  { background-color: rgba(255,255,255,0.06); }
+.bg-white\/8  { background-color: rgba(255,255,255,0.08); }
+
+.border-white\/6  { border-color: rgba(255,255,255,0.06); }
+.border-white\/8  { border-color: rgba(255,255,255,0.08); }
+.border-white\/10 { border-color: rgba(255,255,255,0.10); }
+.border-white\/12 { border-color: rgba(255,255,255,0.12); }
+
+.text-white\/18 { color: rgba(255,255,255,0.18); }
+.text-white\/22 { color: rgba(255,255,255,0.22); }
+.text-white\/28 { color: rgba(255,255,255,0.28); }
+
+/* ─── Card hover — softer drift, no jitter ───────────────────── */
+.card-hover-glitch {
+  transition: border-color 0.5s ease, background-color 0.5s ease, transform 0.4s ease;
+}
+
+.card-hover-glitch:hover {
+  transform: translateY(-1px);
+}
+
+/* ─── Transition 400ms ───────────────────────────────────────── */
+.duration-400 {
+  transition-duration: 400ms;
 }
 
 /* ─── Input placeholder override ────────────────────────────── */
 input::placeholder,
 textarea::placeholder {
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.18);
 }
