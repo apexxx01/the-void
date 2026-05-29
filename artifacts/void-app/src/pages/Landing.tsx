@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { GlitchText } from "@/components/GlitchText";
 import { VortexBackground } from "@/components/VortexBackground";
 import { TypeWriter } from "@/components/TypeWriter";
 import { StaticLoader } from "@/components/StaticLoader";
@@ -9,58 +8,74 @@ import { useAuth } from "@clerk/react";
 export default function Landing() {
   const { isSignedIn } = useAuth();
   const [loaderDone, setLoaderDone] = useState(false);
-  const [showSubtitle, setShowSubtitle] = useState(false);
+  const [showBody, setShowBody] = useState(false);
   const [showButtons, setShowButtons] = useState(false);
+
+  // Safety fallback
+  useEffect(() => {
+    const t = setTimeout(() => setLoaderDone(true), 1400);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <>
       {!loaderDone && <StaticLoader onDone={() => setLoaderDone(true)} />}
-      <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center relative overflow-hidden">
-        <VortexBackground intensity={0.7} />
 
-        {/* Vignette */}
-        <div
-          className="fixed inset-0 pointer-events-none"
-          style={{
-            zIndex: 1,
-            background:
-              "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.7) 100%)",
-          }}
-        />
+      <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center relative overflow-hidden select-none">
+        <VortexBackground intensity={0.65} />
 
-        <div className="relative flex flex-col items-center text-center p-6 max-w-2xl" style={{ zIndex: 2 }}>
-          <div className="mb-2 text-white/20 text-xs font-mono tracking-[0.5em] uppercase mb-8 fade-in-slow">
+        {/* Deep vignette — much stronger at edges */}
+        <div className="fixed inset-0 pointer-events-none" style={{
+          zIndex: 1,
+          background: "radial-gradient(ellipse 60% 60% at 50% 50%, transparent 0%, rgba(0,0,0,0.5) 55%, rgba(0,0,0,0.92) 100%)",
+        }} />
+
+        {/* Content — fully above vortex */}
+        <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-xl w-full">
+
+          {/* Eyebrow */}
+          <p className="text-white/25 text-[10px] tracking-[0.6em] uppercase font-mono mb-10 fade-in-slow">
             signal detected
-          </div>
+          </p>
 
-          <GlitchText
-            text="void."
-            as="h1"
-            className="text-7xl md:text-9xl font-bold tracking-tighter mb-8 fade-in-slow"
-          />
+          {/* Title — always visible, no glitch box */}
+          <h1
+            className="font-bold tracking-tighter text-white mb-10 fade-in-slow"
+            style={{
+              fontSize: "clamp(4rem, 14vw, 9rem)",
+              lineHeight: 1,
+              textShadow: "0 0 60px rgba(255,255,255,0.12), 0 0 120px rgba(255,255,255,0.05)",
+              letterSpacing: "-0.04em",
+            }}
+          >
+            void<span style={{ opacity: 0.5 }}>.</span>
+          </h1>
 
-          <div className="text-base md:text-lg text-white/50 mb-16 max-w-sm leading-loose font-mono min-h-[80px]">
+          {/* Subtitle typewriter */}
+          <div className="font-mono text-white/40 text-sm md:text-base leading-relaxed mb-14 min-h-[48px]">
             {loaderDone && (
               <TypeWriter
                 text="a sanctuary in the static. speak to the void. it listens."
-                speed={30}
-                delay={400}
+                speed={28}
+                delay={300}
+                cursor={false}
                 onDone={() => {
-                  setShowSubtitle(true);
-                  setTimeout(() => setShowButtons(true), 600);
+                  setShowBody(true);
+                  setTimeout(() => setShowButtons(true), 500);
                 }}
               />
             )}
           </div>
 
+          {/* Buttons */}
           <div
-            className="flex flex-col sm:flex-row gap-6 w-full sm:w-auto transition-all duration-1000"
-            style={{ opacity: showButtons ? 1 : 0, transform: showButtons ? "translateY(0)" : "translateY(12px)" }}
+            className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto transition-all duration-700"
+            style={{ opacity: showButtons ? 1 : 0, transform: showButtons ? "translateY(0)" : "translateY(10px)" }}
           >
             {isSignedIn ? (
               <Link
                 href="/dashboard"
-                className="px-10 py-4 border border-white/60 bg-white/5 text-white hover:bg-white hover:text-black transition-all duration-500 font-mono tracking-[0.3em] text-center backdrop-blur-sm"
+                className="px-12 py-4 border border-white/50 bg-white/5 text-white hover:bg-white hover:text-black transition-all duration-400 font-mono tracking-[0.3em] text-sm text-center backdrop-blur-sm"
                 data-testid="link-enter"
               >
                 [ ENTER ]
@@ -69,14 +84,14 @@ export default function Landing() {
               <>
                 <Link
                   href="/sign-in"
-                  className="px-10 py-4 border border-white/30 hover:border-white/70 bg-transparent text-white/70 hover:text-white transition-all duration-500 font-mono tracking-[0.3em] text-center"
+                  className="px-10 py-4 border border-white/20 hover:border-white/50 text-white/50 hover:text-white transition-all duration-400 font-mono tracking-[0.3em] text-sm text-center"
                   data-testid="link-login"
                 >
                   [ LOGIN ]
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="px-10 py-4 border border-white/60 bg-white/5 text-white hover:bg-white hover:text-black transition-all duration-500 font-mono tracking-[0.3em] text-center backdrop-blur-sm"
+                  className="px-10 py-4 border border-white/50 bg-white/5 text-white hover:bg-white hover:text-black transition-all duration-400 font-mono tracking-[0.3em] text-sm text-center backdrop-blur-sm"
                   data-testid="link-signup"
                 >
                   [ ENTER VOID ]
@@ -85,12 +100,13 @@ export default function Landing() {
             )}
           </div>
 
-          <div
-            className="mt-20 text-white/15 text-xs font-mono tracking-[0.4em] transition-opacity duration-2000"
-            style={{ opacity: showSubtitle ? 1 : 0 }}
+          {/* Footer micro-text */}
+          <p
+            className="mt-16 text-white/12 text-[10px] font-mono tracking-[0.5em] uppercase transition-opacity duration-1500"
+            style={{ opacity: showBody ? 1 : 0 }}
           >
             mental health · silence · sanctuary
-          </div>
+          </p>
         </div>
       </div>
     </>

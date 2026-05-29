@@ -20,15 +20,17 @@ import Diary from "@/pages/Diary";
 import Breathe from "@/pages/Breathe";
 import Reflect from "@/pages/Reflect";
 import Manifest from "@/pages/Manifest";
+import Mood from "@/pages/Mood";
+import Ground from "@/pages/Ground";
+import Letter from "@/pages/Letter";
+import Signal from "@/pages/Signal";
 
 const queryClient = new QueryClient();
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL as string | undefined;
 
-if (!clerkPubKey) {
-  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
-}
+if (!clerkPubKey) throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
 
 const clerkAppearance = {
   cssLayerName: "clerk",
@@ -66,12 +68,8 @@ const clerkAppearance = {
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   return (
     <>
-      <Show when="signed-in">
-        <Component />
-      </Show>
-      <Show when="signed-out">
-        <RedirectToSignIn />
-      </Show>
+      <Show when="signed-in"><Component /></Show>
+      <Show when="signed-out"><RedirectToSignIn /></Show>
     </>
   );
 }
@@ -82,26 +80,16 @@ function Router() {
       <Route path="/" component={Landing} />
       <Route path="/sign-in/*?" component={Login} />
       <Route path="/sign-up/*?" component={SignUpPage} />
-
-      <Route path="/dashboard">
-        <ProtectedRoute component={Dashboard} />
-      </Route>
-      <Route path="/chat">
-        <ProtectedRoute component={Chat} />
-      </Route>
-      <Route path="/diary">
-        <ProtectedRoute component={Diary} />
-      </Route>
-      <Route path="/breathe">
-        <ProtectedRoute component={Breathe} />
-      </Route>
-      <Route path="/reflect">
-        <ProtectedRoute component={Reflect} />
-      </Route>
-      <Route path="/manifest">
-        <ProtectedRoute component={Manifest} />
-      </Route>
-
+      <Route path="/dashboard"><ProtectedRoute component={Dashboard} /></Route>
+      <Route path="/chat"><ProtectedRoute component={Chat} /></Route>
+      <Route path="/diary"><ProtectedRoute component={Diary} /></Route>
+      <Route path="/breathe"><ProtectedRoute component={Breathe} /></Route>
+      <Route path="/reflect"><ProtectedRoute component={Reflect} /></Route>
+      <Route path="/manifest"><ProtectedRoute component={Manifest} /></Route>
+      <Route path="/mood"><ProtectedRoute component={Mood} /></Route>
+      <Route path="/ground"><ProtectedRoute component={Ground} /></Route>
+      <Route path="/letter"><ProtectedRoute component={Letter} /></Route>
+      <Route path="/signal"><ProtectedRoute component={Signal} /></Route>
       <Route component={NotFound} />
     </Switch>
   );
@@ -128,9 +116,8 @@ function App() {
           </ClerkProvider>
         </WouterRouter>
         <Toaster />
-        {/* Global ambient overlays */}
         <CursorTrail />
-        <NoiseOverlay opacity={0.025} />
+        <NoiseOverlay opacity={0.022} />
         <GlitchBars />
         <ScrollProgress />
       </TooltipProvider>
